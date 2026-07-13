@@ -8,12 +8,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: bd-mobile-compat-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build:
@@ -25,12 +19,8 @@ jobs:
 
       - name: Vérifier le ZIP
         run: |
-          echo "Fichiers présents dans le dépôt :"
-          ls -la
-
           if [ ! -f "BDMobileCompat-GitHub-ready.zip" ]; then
             echo "ERREUR : BDMobileCompat-GitHub-ready.zip est absent."
-            echo "Ajoute le ZIP à la racine du dépôt sans le renommer."
             exit 1
           fi
 
@@ -38,14 +28,10 @@ jobs:
         run: |
           rm -rf project
           mkdir project
-
           unzip -q BDMobileCompat-GitHub-ready.zip -d project
 
-          echo "Contenu du projet :"
-          find project -maxdepth 3 -type f | sort
-
           if [ ! -f "project/package.json" ]; then
-            echo "ERREUR : package.json est absent du ZIP."
+            echo "ERREUR : package.json est absent."
             exit 1
           fi
 
@@ -68,14 +54,11 @@ jobs:
 
       - name: Préparer le paquet Revenge
         run: |
-          rm -rf release public
-          mkdir -p release public
+          rm -rf release
+          mkdir release
 
           cp project/repo.json release/repo.json
           cp -R project/builds release/builds
-
-          cp project/repo.json public/repo.json
-          cp -R project/builds public/builds
 
           cd release
           zip -r ../BDMobileCompat-Revenge.zip .
@@ -86,28 +69,3 @@ jobs:
           name: BDMobileCompat-Revenge
           path: BDMobileCompat-Revenge.zip
           if-no-files-found: error
-
-      - name: Configurer GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        uses: actions/configure-pages@v5
-
-      - name: Préparer GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public
-
-  deploy:
-    if: github.ref == 'refs/heads/main'
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Publier le dépôt Revenge
-        id: deployment
-        uses: actions/deploy-pages@v4
