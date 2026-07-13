@@ -1,0 +1,86 @@
+name: Build BD Mobile Compat
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: bd-mobile-compat-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm install
+
+      - name: Vérifier le TypeScript
+        run: npm run typecheck
+
+      - name: Compiler et tester
+        run: npm test
+
+      - name: Préparer le paquet Revenge
+        run: |
+          rm -rf release public
+          mkdir -p release public
+
+          cp repo.json release/repo.json
+          cp -R builds release/builds
+
+          cp repo.json public/repo.json
+          cp -R builds public/builds
+
+          cd release
+          zip -r ../BDMobileCompat-Revenge.zip .
+
+      - name: Envoyer le fichier compilé
+        uses: actions/upload-artifact@v4
+        with:
+          name: BDMobileCompat-Revenge
+          path: BDMobileCompat-Revenge.zip
+          if-no-files-found: error
+
+      - name: Configurer GitHub Pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+
+      - name: Préparer GitHub Pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Publier le dépôt Revenge
+        id: deployment
+        uses: actions/deploy-pages@v4
