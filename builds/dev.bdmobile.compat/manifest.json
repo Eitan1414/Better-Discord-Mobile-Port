@@ -1,0 +1,14 @@
+{
+  "name": "BD Mobile Compat",
+  "description": "Experimental BetterDiscord BdApi compatibility bridge for Revenge on Discord Android.",
+  "authors": [
+    {
+      "name": "Eitan1414"
+    }
+  ],
+  "main": "index.js",
+  "hash": "e5db6ee91e90030380d5d6a08cc2846d99163dbfeb301eab91f0d6754f3e62bb",
+  "vendetta": {
+    "icon": "settings"
+  }
+}
