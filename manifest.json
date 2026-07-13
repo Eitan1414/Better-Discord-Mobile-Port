@@ -1,0 +1,21 @@
+{
+  "id": "dev.bdmobile.compat",
+  "spec": 3,
+  "version": "0.1.0",
+  "type": "plugin",
+  "display": {
+    "name": "BD Mobile Compat",
+    "description": "Experimental BetterDiscord BdApi compatibility bridge for Revenge on Discord Android.",
+    "authors": [
+      {
+        "name": "Community build"
+      }
+    ]
+  },
+  "main": "index.js",
+  "extras": {
+    "platform": "android",
+    "runtime": "revenge",
+    "experimental": true
+  }
+}
