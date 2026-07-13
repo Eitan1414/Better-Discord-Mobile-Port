@@ -1,0 +1,9 @@
+{
+  "$meta": {
+    "name": "BD Mobile Compat",
+    "description": "Experimental BetterDiscord compatibility for Discord Android through Revenge."
+  },
+  "dev.bdmobile.compat": {
+    "version": "0.1.0"
+  }
+}
